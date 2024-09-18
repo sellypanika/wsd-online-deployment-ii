@@ -15,7 +15,7 @@ const data = {
 
 const handleRequest = async (request) => {
   const url = new URL(request.url);
-  if (url.pathname === "/visit") {
+  if (url.pathname === "/visits") {
     data.count++;
     return new Response(await renderFile("count.eta", data), responseDetails);
   }
