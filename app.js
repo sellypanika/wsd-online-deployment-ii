@@ -1,9 +1,8 @@
 // app.js
 import { serve } from "./deps.js";
-import { configure, renderFile } from "./deps.js";
+import { configure, postgres, renderFile } from "./deps.js";
 import { sql } from "./database/database.js";
 import * as messageService from "./services/messageService.js";
-import postgres from "https://deno.land/x/postgresjs@v3.4.4/mod.js";
 
 configure({ views: "./views" });
 
@@ -21,7 +20,38 @@ async function createTable() {
 createTable();
 
 const handleRequest = async (req) => {
-  const url = new URL(req.url);
+  const { method } = req;
+
+  if (method === "GET") {
+    // Fetch recent messages
+    const messages = await getRecentMessages();
+
+    // Render the HTML
+    const html = await renderFile("./views/index.eta", { messages });
+    return new Response(html, {
+      headers: { "content-type": "text/html" },
+    });
+  }
+
+  if (method === "POST") {
+    const formData = await req.formData();
+    const sender = formData.get("sender");
+    const message = formData.get("message");
+
+    // Add message to the database
+    await addMessage(sender, message);
+
+    // Redirect after adding the message (303)
+    return new Response(null, {
+      status: 303,
+      headers: { Location: "/" },
+    });
+  }
+
+  return new Response("Method Not Allowed", { status: 405 });
+};
+
+/* const url = new URL(req.url);
 
   // Handle GET request at root
   if (url.pathname === "/") {
@@ -61,6 +91,6 @@ async function getRecentMessages() {
 async function addMessage(sender, message) {
   await messageService.addMessage(sender, message);
 }
-
+*/
 // Start the server
 serve(handleRequest, { port: 7777 });
