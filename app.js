@@ -2,6 +2,8 @@
 import { serve } from "./deps.js";
 import { configure, renderFile } from "./deps.js";
 import { sql } from "./database/database.js";
+import * as messageService from "./services/messageService.js";
+import postgres from "https://deno.land/x/postgresjs@v3.4.4/mod.js";
 
 configure({ views: "./views" });
 
