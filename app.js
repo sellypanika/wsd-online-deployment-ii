@@ -1,7 +1,7 @@
 // app.js
-import { serve } from "https://deno.land/std@0.222.1/http/server.ts";
-import { configure, renderFile } from "https://deno.land/x/eta@v2.2.0/mod.ts";
-import * as messageService from "./services/messageService.js";
+import { serve } from "./deps.js";
+import { configure, renderFile } from "./deps.js";
+import { sql } from "./database/database.js";
 
 configure({ views: "./views" });
 
