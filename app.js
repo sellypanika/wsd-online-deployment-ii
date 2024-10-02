@@ -7,6 +7,20 @@ import postgres from "https://deno.land/x/postgresjs@v3.4.4/mod.js";
 
 configure({ views: "./views" });
 
+async function createTable() {
+  await sql`
+    CREATE TABLE IF NOT EXISTS messages (
+      id SERIAL PRIMARY KEY,
+      sender TEXT NOT NULL,
+      message TEXT NOT NULL
+    );
+  `;
+}
+
+// Run table creation on application startup
+createTable().catch(err => console.error("Error creating table:", err));
+
+
 const handleRequest = async (req) => {
   const url = new URL(req.url);
 
