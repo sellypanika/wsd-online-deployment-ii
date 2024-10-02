@@ -26,7 +26,7 @@ const handleRequest = async (req) => {
   // Handle GET request at root
   if (url.pathname === "/") {
     const messages = await getRecentMessages();
-    const body = await renderFile("index.eta", { messages: messages });
+    const body = await renderFile("index.eta", { sender: messages });
     return new Response(body, { headers: { "Content-Type": "text/html" } });
   }
 
