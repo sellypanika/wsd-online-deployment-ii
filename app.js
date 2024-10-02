@@ -1,37 +1,51 @@
-import { serve } from "./deps.js";
-import { configure, renderFile } from "./deps.js";
-import { sql } from "./database/database.js";
+// app.js
+import { serve } from "https://deno.land/std@0.222.1/http/server.ts";
+import { configure, renderFile } from "https://deno.land/x/eta@v2.2.0/mod.ts";
+import * as messageService from "./services/messageService.js";
 
-configure({
-  views: `${Deno.cwd()}/views/`,
-});
+configure({ views: "./views" });
 
-const responseDetails = {
-  headers: { "Content-Type": "text/html;charset=UTF-8" },
-};
+const handleRequest = async (req) => {
+  const url = new URL(req.url);
 
-const data = {
-  count: 0,
-};
-
-const handleRequest = async (request) => {
-  const url = new URL(request.url);
-  if (url.pathname === "/count") {
-    data.count++;
-    return new Response(await renderFile("count.eta", data), responseDetails);
+  // Handle GET request at root
+  if (url.pathname === "/") {
+    const messages = await getRecentMessages();
+    const body = await renderFile("index.eta", { messages });
+    return new Response(body, { headers: { "Content-Type": "text/html" } });
   }
 
-  if (url.pathname === "/addresses") {
-    const rows = await sql`SELECT COUNT(*) as count FROM addresses`;
-    let rowCount = -42;
-    if (rows.length > 0) {
-      rowCount = rows[0].count;
+  // Handle POST request at root (form submission)
+  if (url.pathname === "/" && req.method === "POST") {
+    const formData = await req.formData();
+    const sender = formData.get("sender");
+    const message = formData.get("message");
+
+    if (sender && message) {
+      // Add message to the database
+      await addMessage(sender, message);
+      return new Response(null, {
+        status: 303,
+        headers: { "Location": "/" },
+      });
     }
 
-    return new Response(`Total rows: ${rowCount}`);
+    return new Response("Invalid input", { status: 400 });
   }
 
-  return new Response("Hello you!");
+  // Handle 404 for other paths
+  return new Response("Not Found", { status: 404 });
 };
 
+// Function to get recent messages
+async function getRecentMessages() {
+  return await messageService.recentMessages();
+}
+
+// Function to add a message
+async function addMessage(sender, message) {
+  await messageService.addMessage(sender, message);
+}
+
+// Start the server
 serve(handleRequest, { port: 7777 });
