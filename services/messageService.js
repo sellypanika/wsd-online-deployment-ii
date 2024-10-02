@@ -1,6 +1,6 @@
 import { sql } from "../database/database.js";
 
-const recentMessages = async function getRecentMessages(limit = 5) {
+const recentMessages = async function (limit = 5) {
   return await sql`
     SELECT sender, message FROM messages
     ORDER BY id DESC
@@ -8,7 +8,7 @@ const recentMessages = async function getRecentMessages(limit = 5) {
   `;
 };
 
-const addMessage = async function addMessage(sender, message) {
+const addMessage = async function (sender, message) {
   await sql`
     INSERT INTO messages (sender, message)
     VALUES (${sender}, ${message})

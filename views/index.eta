@@ -17,12 +17,9 @@
 
  <h2>Recent Messages</h2>
 <ul>
-  <% for (const message of it.sender) { %>
+  <% for (const message of it.messages) { %>
     <li><strong><%= message.sender %>:</strong> <%= message.message %></li>
   <% } %>
 </ul>
-
-
-
 </body>
 </html>
