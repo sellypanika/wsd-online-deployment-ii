@@ -17,10 +17,10 @@
 
  <h2>Recent Messages</h2>
 <ul>
-    <% messages.forEach(function(message) { %>
-      <li><strong><%= message.sender %>:</strong> <%= message.message %></li>
-    <% }); %>
-  </ul>
+  <% for (const message of it.messages) { %>
+    <li><strong><%= message.sender %>:</strong> <%= message.message %></li>
+  <% } %>
 </ul>
+
 </body>
 </html>
