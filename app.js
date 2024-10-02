@@ -18,8 +18,7 @@ async function createTable() {
 }
 
 // Run table creation on application startup
-createTable().catch(err => console.error("Error creating table:", err));
-
+createTable();
 
 const handleRequest = async (req) => {
   const url = new URL(req.url);
@@ -27,7 +26,7 @@ const handleRequest = async (req) => {
   // Handle GET request at root
   if (url.pathname === "/") {
     const messages = await getRecentMessages();
-    const body = await renderFile("index.eta", { messages });
+    const body = await renderFile("index.eta", { messages: messages });
     return new Response(body, { headers: { "Content-Type": "text/html" } });
   }
 
