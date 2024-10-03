@@ -24,9 +24,9 @@
 
   <h2>Recent Messages</h2>
   <ul>
-    <% it.messages.forEach(function(msg) { %>
+    <%  <% for (let msg of it.messages) { %>
       <li><%= msg.sender %>: <%= msg.message %></li>
-    <% }); %>
+    <% } %>
   </ul>
 
 </body>
