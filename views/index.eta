@@ -24,12 +24,10 @@
 
   <h2>Recent Messages</h2>
   <ul>
-    <% it.messages.forEach((msg) => { %>
+    <% it.messages.forEach(function(msg) { %>
       <li><%= msg.sender %>: <%= msg.message %></li>
     <% }); %>
   </ul>
 
 </body>
 </html>
-
-
