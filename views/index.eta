@@ -17,7 +17,7 @@
     <input type="text" name="sender" required><br/>
     
     <label for="message">Message:</label>
-    <textarea name="message" required></textarea><br/>
+    <input type= "text" name= "message" required><br/>
     
     <input type="submit" value="Send">
   </form>
