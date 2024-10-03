@@ -1,8 +1,8 @@
 // app.js
 import { serve } from "./deps.js";
-import { configure, postgres, renderFile } from "./deps.js";
+import { configure, renderFile } from "./deps.js";
 import { sql } from "./database/database.js";
-import * as messageService from "./services/messageService.js";
+import * as messageService from "./services/messageService.js"; // Fix the name
 
 configure({ views: "./views" });
 
@@ -35,25 +35,37 @@ const redirectTo = (path) => {
 
 // Handle message form submission
 const addMessage = async (request) => {
-  const formData = await request.formData();
+  try {
+    const formData = await request.formData();
+    const sender = formData.get("sender");
+    const message = formData.get("message");
 
-  const sender = formData.get("sender");
-  const message = formData.get("message");
+    if (!sender || !message) {
+      return new Response("Sender and message are required!", {
+        status: 400,
+      });
+    }
 
-  await messagesService.createMessage(sender, message); // Add message to DB
-
-  return redirectTo("/"); // Redirect after POST
+    await messageService.createMessage(sender, message); // Add message to DB
+    return redirectTo("/"); // Redirect after POST
+  } catch (error) {
+    console.error("Error adding message:", error);
+    return new Response("Failed to add message", { status: 500 });
+  }
 };
 
 // List the recent messages
-const listMessages = async (request) => {
-  const messages = await messagesService.findRecentMessages();
-
-  const data = {
-    messages: messages,
-  };
-
-  return new Response(await renderFile("index.eta", data), responseDetails);
+const listMessages = async () => {
+  try {
+    const messages = await messageService.findRecentMessages();
+    const data = {
+      messages: messages,
+    };
+    return new Response(await renderFile("index.eta", data), responseDetails);
+  } catch (error) {
+    console.error("Error retrieving messages:", error);
+    return new Response("Failed to load messages", { status: 500 });
+  }
 };
 
 // Handle requests: GET and POST
@@ -63,7 +75,7 @@ const handleRequest = async (request) => {
   if (request.method === "POST") {
     return await addMessage(request); // Handle form submission
   } else {
-    return await listMessages(request); // List messages on GET request
+    return await listMessages(); // List messages on GET request
   }
 };
 
