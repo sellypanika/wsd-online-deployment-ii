@@ -19,47 +19,53 @@ async function createTable() {
 // Run table creation on application startup
 createTable();
 
-const handleRequest = async (req) => {
-  const url = new URL(req.url);
-
-  // Handle GET request at root
-  if (url.pathname === "/") {
-    const messages = await getRecentMessages();
-    const body = await renderFile("index.eta", { messages: messages });
-    return new Response(body, { headers: { "Content-Type": "text/html" } });
-  }
-
-  // Handle POST request at root (form submission)
-  if (url.pathname === "/" && req.method === "POST") {
-    const formData = await req.formData();
-    const sender = formData.get("sender");
-    const message = formData.get("message");
-
-    if (sender && message) {
-      // Add message to the database
-      await addMessage(sender, message);
-      return new Response(null, {
-        status: 303,
-        headers: { "Location": "/" },
-      });
-    }
-
-    return new Response("Invalid input", { status: 400 });
-  }
-
-  // Handle 404 for other paths
-  return new Response("Not Found", { status: 404 });
+const responseDetails = {
+  headers: { "Content-Type": "text/html;charset=UTF-8" },
 };
 
-// Function to get recent messages
-async function getRecentMessages() {
-  return await messageService.recentMessages();
-}
+// Redirect helper function (POST/Redirect/GET pattern)
+const redirectTo = (path) => {
+  return new Response(`Redirecting to ${path}.`, {
+    status: 303,
+    headers: {
+      "Location": path,
+    },
+  });
+};
 
-// Function to add a message
-async function addMessage(sender, message) {
-  await messageService.addMessage(sender, message);
-}
+// Handle message form submission
+const addMessage = async (request) => {
+  const formData = await request.formData();
+
+  const sender = formData.get("sender");
+  const message = formData.get("message");
+
+  await messagesService.createMessage(sender, message); // Add message to DB
+
+  return redirectTo("/"); // Redirect after POST
+};
+
+// List the recent messages
+const listMessages = async (request) => {
+  const messages = await messagesService.findRecentMessages();
+
+  const data = {
+    messages: messages,
+  };
+
+  return new Response(await renderFile("index.eta", data), responseDetails);
+};
+
+// Handle requests: GET and POST
+const handleRequest = async (request) => {
+  const url = new URL(request.url);
+
+  if (request.method === "POST") {
+    return await addMessage(request); // Handle form submission
+  } else {
+    return await listMessages(request); // List messages on GET request
+  }
+};
 
 // Start the server
 serve(handleRequest, { port: 7777 });

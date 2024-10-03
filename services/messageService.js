@@ -1,18 +1,20 @@
 import { sql } from "../database/database.js";
 
-const recentMessages = async function getRecentMessages(limit = 5) {
+// Function to retrieve the 5 most recent messages
+const findRecentMessages = async () => {
   return await sql`
-    SELECT sender, message FROM messages
+    SELECT * FROM messages 
     ORDER BY id DESC
-    LIMIT ${limit}
+    LIMIT 5
   `;
 };
 
-const addMessage = async function addMessage(sender, message) {
+// Function to add a new message to the database
+const createMessage = async (sender, message) => {
   await sql`
     INSERT INTO messages (sender, message)
     VALUES (${sender}, ${message})
   `;
 };
 
-export { addMessage, recentMessages };
+export { createMessage, findRecentMessages };

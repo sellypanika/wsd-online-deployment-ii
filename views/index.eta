@@ -7,19 +7,25 @@
   <link rel="stylesheet" href="/public/style.css">
 </head>
 <body>
-  <h1>Simple Chat</h1>
-  
-  <form action="/" method="POST">
-    <input type="text" name="sender" placeholder="Your name" required>
-    <input type="text" name="message" placeholder="Your message" required>
-    <input type="submit" value="Submit" />
-  </form>
+ <h1>Chat Application</h1>
 
- <h2>Recent Messages</h2>
+<h2>Send a message</h2>
+
+<form method="POST">
+  <label for="sender">Name:</label>
+  <input type="text" name="sender" required /><br/>
+  
+  <label for="message">Message:</label>
+  <textarea name="message" required></textarea><br/>
+  
+  <input type="submit" value="Send" />
+</form>
+
+<h2>Recent Messages</h2>
 <ul>
-  <% for (const message of it.messages) { %>
-    <li><strong><%= message.sender %>:</strong> <%= message.message %></li>
-  <% } %>
+  <% it.messages.forEach((msg) => { %>
+    <li><%= msg.sender %>: <%= msg.message %></li>
+  <% }); %>
 </ul>
 
 
