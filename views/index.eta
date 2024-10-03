@@ -24,11 +24,12 @@
 
   <h2>Recent Messages</h2>
   <ul>
-    <%  <% for (let msg of it.messages) { %>
+    <% it.messages.forEach((msg) => { %>
       <li><%= msg.sender %>: <%= msg.message %></li>
-    <% } %>
+    <% }); %>
   </ul>
 
 </body>
 </html>
+
 
